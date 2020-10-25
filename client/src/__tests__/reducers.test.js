@@ -21,6 +21,8 @@ import {
   UPDATE_CURRENT_CATEGORY
 } from '../utils/actions';
 
+import { reducer } from '../utils/reducers.js';
+
 //create sample of what our global state will look like
 const initialState = {
   products: [],
@@ -39,4 +41,32 @@ test('UPDATE_PRODUCTS', () => {
 
   expect(newState.products.length).toBe(2);
   expect(initialState.products.length).toBe(0);
+});
+
+//similar to the one above but will be used to test how we can update
+// the categories array, and execute the reducer function() still
+// passing in the initialState, but now the action type and value changed
+// execute the update categories to be a new array of categories
+test('UPDATE_CATEGORIES', () => {
+  let newState = reducer(initialState, {
+    type: UPDATE_CATEGORIES,
+    categories: [{}, {}]
+  });
+
+  expect(newState.categories.length).toBe(2);
+  expect(initialState.categories.length).toBe(1);
+});
+
+//updating the state of currentCategory to a new string value
+// instead of an array. compaies these values between
+// newState and initialState to confirm the initialState
+// has remained the same
+test('UPDATE_CURRENT_CATEGORY', () => {
+  let newState = reducer(initialState, {
+    type: UPDATE_CURRENT_CATEGORY,
+    currentCategory: '2'
+  });
+
+  expect(newState.currentCategory).toBe('2');
+  expect(initialState.currentCategory).toBe('1');
 });
