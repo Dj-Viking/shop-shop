@@ -1,8 +1,27 @@
 import React from "react";
+
+import { useStoreContext } from '../../utils/GlobalState.js';
+import { UPDATE_CURRENT_CATEGORY } from '../../utils/actions.js';
+
 import Auth from "../../utils/auth";
 import { Link } from "react-router-dom";
 
 function Nav() {
+  //retrieve the global state object and dispatch method to update state
+  const [state, dispatch] = useStoreContext();
+  const { categories } = state;
+
+  console.log(categories);
+
+  const setCurrentCategoryBlank = () => {
+    dispatch
+    (
+      {
+        type: UPDATE_CURRENT_CATEGORY,
+        currentCategory: ''
+      }
+    );
+  }
 
   function showNavigation() {
     if (Auth.loggedIn()) {
@@ -42,8 +61,16 @@ function Nav() {
   return (
     <header className="flex-row px-1">
       <h1>
-        <Link to="/">
-          <span role="img" aria-label="shopping bag">🛍️</span>
+        <Link 
+          onClick={setCurrentCategoryBlank}
+          to="/"
+        >
+          <span 
+            role="img" 
+            aria-label="shopping bag"
+          >
+            🛍️
+          </span>
           -Shop-Shop
         </Link>
       </h1>
