@@ -3,7 +3,12 @@ import { Link, useParams } from "react-router-dom";
 import { useQuery } from '@apollo/react-hooks';
 
 import { useStoreContext } from '../utils/GlobalState.js';
-import { UPDATE_PRODUCTS } from '../utils/actions.js';
+import {
+  REMOVE_FROM_CART,
+  UPDATE_CART_QUANTITY,
+  ADD_TO_CART,
+  UPDATE_PRODUCTS,
+} from '../utils/actions.js';
 
 import { QUERY_PRODUCTS } from "../utils/queries";
 import spinner from '../assets/spinner.gif'
@@ -32,7 +37,17 @@ function Detail() {
         }
       );
     }
-  }, [products, data, dispatch, id])
+  }, [products, data, dispatch, id]);
+
+  const addToCart = () => {
+    dispatch
+    (
+      {
+        type: ADD_TO_CART,
+        product: { ...currentProduct, purchaseQuantity: 1 }
+      }
+    );
+  };
 
   return (
     <>
@@ -52,7 +67,9 @@ function Detail() {
             <strong>Price:</strong>
             ${currentProduct.price}
             {" "}
-            <button>
+            <button
+              onClick={addToCart}
+            >
               Add to Cart
             </button>
             <button>
