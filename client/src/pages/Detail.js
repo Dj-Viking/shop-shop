@@ -8,6 +8,8 @@ import { UPDATE_PRODUCTS } from '../utils/actions.js';
 import { QUERY_PRODUCTS } from "../utils/queries";
 import spinner from '../assets/spinner.gif'
 
+import Cart from '../components/Cart/index.js';
+
 function Detail() {
   const [state, dispatch] = useStoreContext();
   const { id } = useParams();
@@ -67,6 +69,7 @@ function Detail() {
       {
         loading ? <img src={spinner} alt="loading" /> : null
       }
+    <Cart />
     </>
   );
 };
