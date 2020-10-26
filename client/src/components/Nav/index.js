@@ -9,9 +9,8 @@ import { Link } from "react-router-dom";
 function Nav() {
   //retrieve the global state object and dispatch method to update state
   const [state, dispatch] = useStoreContext();
-  const { categories } = state;
 
-  console.log(categories);
+  //console.log(categories);
 
   const setCurrentCategoryBlank = () => {
     dispatch

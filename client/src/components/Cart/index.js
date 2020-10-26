@@ -6,20 +6,19 @@ import Auth from '../../utils/auth.js';
 import './style.css';
 
 const Cart = () => {
-  const camera = {
-    name: 'Camera',
-    image: 'camera.jpg',
-    price: 5,
-    purchasQuantity: 3
-  };
-  const soap = {
-    name: 'Soap',
-    image: 'soap.jpg',
-    price: 6,
-    purchasQuantity: 4
-  }
+  // const camera = {
+  //   name: 'Camera',
+  //   image: 'camera.jpg',
+  //   price: 5,
+  //   purchaseQuantity: 3
+  // };
+  // const soap = {
+  //   name: 'Soap',
+  //   image: 'soap.jpg',
+  //   price: 6,
+  //   purchaseQuantity: 4
+  // }
   const [state, dispatch] = useStoreContext();
-  console.log(state.cartOpen);
   const toggleCart = () => {
     dispatch
     (
@@ -29,11 +28,19 @@ const Cart = () => {
     );
     console.log(state.cartOpen);
   };
+  const calculateTotal = () => {
+    let sum = 0;
+    state.cart.forEach(item => {
+      sum += item.price * item.purchaseQuantity;
+    });
+    return sum.toFixed(2);
+  };
 
   return (
     <>
       {
-        state.cartOpen ?
+        state.cartOpen 
+        ?
         (
           <div className="cart">
             <div 
@@ -45,22 +52,64 @@ const Cart = () => {
             <h2>
               Shopping Cart
             </h2>
-            <div>
-              <CartItem item={camera} />
-              <CartItem item={soap} />
-              <div className="flex-row space-between">
-                <strong>Total: $0</strong>
-                {
-                  Auth.loggedIn() 
-                  ?
-                  <button>
-                    Checkout
-                  </button>
-                  :
-                  <span>(log in to check out)</span>
-                }
-              </div>
-            </div>
+            {
+              state.cart.length
+              ?
+              (
+                <div>
+                  {
+                    state.cart.map(item => (
+                      <CartItem 
+                        key={item.id}
+                        item={item}
+                      />
+                    ))
+                  }
+                  <div className="flex-row space-between">
+                    <strong>Total: ${calculateTotal()}</strong>
+                    {
+                      Auth.loggedIn() ?
+                      <button>
+                        Checkout
+                      </button>
+                      :
+                      <span>(log in to check out)</span>
+                    }
+                  </div>
+                </div>
+              )
+              :
+              (
+                <h3>
+                  <span
+                    role="img"
+                    aria-label="shocked"
+                  >
+                    🧐
+                  </span>
+                  You haven't added anything into your cart yet.
+                </h3>
+              )
+            }
+            {
+              /* <div>
+                  <CartItem item={camera} />
+                  <CartItem item={soap} />
+                  <div className="flex-row space-between">
+                    <strong>Total: $0</strong>
+                    {
+                      Auth.loggedIn() 
+                      ?
+                      <button>
+                        Checkout
+                      </button>
+                      :
+                      <span>(log in to check out)</span>
+                    }
+                  </div>
+                </div> 
+              */
+            }
           </div>
         )
         :
