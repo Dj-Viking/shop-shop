@@ -20,13 +20,13 @@ function Detail() {
   const { id } = useParams();
   const [currentProduct, setCurrentProduct] = useState({})
   const { loading, data } = useQuery(QUERY_PRODUCTS);
-  const { products } = state
+  //const { products } = state
 
   useEffect(() => {
-    if (products.length) {
+    if (state.products.length) {
       setCurrentProduct
       (
-        products.find(product => product._id === id)
+        state.products.find(product => product._id === id)
       );
     } else if (data) {
       dispatch
@@ -37,54 +37,86 @@ function Detail() {
         }
       );
     }
-  }, [products, data, dispatch, id]);
-
+  }, [state.products, data, dispatch, id]);
+  //const { cart, product } = state;
   const addToCart = () => {
+    const itemInCart = state.cart.find(cartItem => cartItem._id === id);
+    if (itemInCart) {
+      dispatch
+      (
+        {
+          type: UPDATE_CART_QUANTITY,
+          _id: id,
+          purchaseQuantity: Number(itemInCart.purchaseQuantity) + 1
+        }
+      );
+    } else {
+      dispatch
+      (
+        {
+          type: ADD_TO_CART,
+          product: { ...currentProduct, purchaseQuantity: 1 }
+        }
+      );
+    }
+  };
+  const removeFromCart = () => {
     dispatch
     (
       {
-        type: ADD_TO_CART,
-        product: { ...currentProduct, purchaseQuantity: 1 }
+        type: REMOVE_FROM_CART,
+        _id: currentProduct._id
       }
     );
   };
 
   return (
     <>
-      {currentProduct ? (
-        <div className="container my-1">
-          <Link to="/">
-            ← Back to Products
-          </Link>
-
-          <h2>{currentProduct.name}</h2>
-
-          <p>
-            {currentProduct.description}
-          </p>
-
-          <p>
-            <strong>Price:</strong>
-            ${currentProduct.price}
-            {" "}
-            <button
-              onClick={addToCart}
-            >
-              Add to Cart
-            </button>
-            <button>
-              Remove from Cart
-            </button>
-          </p>
-
-          <img
-            src={`/images/${currentProduct.image}`}
-            alt={currentProduct.name}
-          />
-        </div>
-      ) : null}
       {
-        loading ? <img src={spinner} alt="loading" /> : null
+        currentProduct 
+        ? 
+        (
+          <div className="container my-1">
+            <Link to="/">
+              ← Back to Products
+            </Link>
+
+            <h2>{currentProduct.name}</h2>
+            <p>
+              {currentProduct.description}
+            </p>
+
+            <p>
+              <strong>Price:</strong>
+              ${currentProduct.price}
+              {" "}
+              <button
+                onClick={addToCart}
+              >
+                Add to Cart
+              </button>
+              <button
+                disabled={
+                  !state.cart.find(p => p._id === currentProduct._id)
+                }
+                onClick={removeFromCart}
+              >
+                Remove from Cart
+              </button>
+            </p>
+            <img
+              src={`/images/${currentProduct.image}`}
+              alt={currentProduct.name}
+            />
+          </div>
+        ) 
+        : null
+      }
+      {
+        loading 
+        ? 
+        <img src={spinner} alt="loading" /> 
+        : null
       }
     <Cart />
     </>

@@ -4,6 +4,7 @@ import { TOGGLE_CART } from '../../utils/actions.js';
 import CartItem from '../CartItem/index.js';
 import Auth from '../../utils/auth.js';
 import './style.css';
+import { numberWithCommas } from '../../utils/helpers.js';
 
 const Cart = () => {
   // const camera = {
@@ -66,7 +67,7 @@ const Cart = () => {
                     ))
                   }
                   <div className="flex-row space-between">
-                    <strong>Total: ${calculateTotal()}</strong>
+                    <strong>Total: ${numberWithCommas(calculateTotal())}</strong>
                     {
                       Auth.loggedIn() ?
                       <button>
