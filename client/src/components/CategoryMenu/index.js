@@ -40,9 +40,24 @@ function CategoryMenu() {
     )
   };
 
+  const setCurrentCategoryBlank = () => {
+    dispatch
+    (
+      {
+        type: UPDATE_CURRENT_CATEGORY,
+        currentCategory: ''
+      }
+    );
+  }
+
   return (
     <div>
       <h2>Choose a Category:</h2>
+      <button
+        onClick={setCurrentCategoryBlank}
+      >
+        All Categories
+      </button>
       {
         categories.map(item => (
           <button
