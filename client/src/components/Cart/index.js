@@ -1,10 +1,11 @@
 import React from 'react';
+import { useStoreContext } from '../../utils/GlobalState.js';
+import { TOGGLE_CART } from '../../utils/actions.js';
 import CartItem from '../CartItem/index.js';
 import Auth from '../../utils/auth.js';
 import './style.css';
 
 const Cart = () => {
-
   const camera = {
     name: 'Camera',
     image: 'camera.jpg',
@@ -17,32 +18,67 @@ const Cart = () => {
     price: 6,
     purchasQuantity: 4
   }
+  const [state, dispatch] = useStoreContext();
+  console.log(state.cartOpen);
+  const toggleCart = () => {
+    dispatch
+    (
+      {
+        type: TOGGLE_CART
+      }
+    );
+    console.log(state.cartOpen);
+  };
+
   return (
-    <div className="cart">
-      <div className="close">
-          [close]
-      </div>
-      <h2>
-        Shopping Cart
-      </h2>
-      <div>
-        <CartItem item={camera} />
-        <CartItem item={soap} />
-        <div className="flex-row space-between">
-          <strong>Total: $0</strong>
-          {
-            Auth.loggedIn() 
-            ?
-            <button>
-              Checkout
-            </button>
-            :
-            <span>(log in to check out)</span>
-          }
-        </div>
-      </div>
-      
-    </div>
+    <>
+      {
+        state.cartOpen ?
+        (
+          <div className="cart">
+            <div 
+              className="close"
+              onClick={toggleCart}
+            >
+                [close]
+            </div>
+            <h2>
+              Shopping Cart
+            </h2>
+            <div>
+              <CartItem item={camera} />
+              <CartItem item={soap} />
+              <div className="flex-row space-between">
+                <strong>Total: $0</strong>
+                {
+                  Auth.loggedIn() 
+                  ?
+                  <button>
+                    Checkout
+                  </button>
+                  :
+                  <span>(log in to check out)</span>
+                }
+              </div>
+            </div>
+          </div>
+        )
+        :
+        (
+          <div
+            className="cart-closed"
+            onClick={toggleCart}
+          >
+            <span
+              role="img"
+              aria-label="cart"
+            >
+              🛒
+            </span>
+          </div>
+        )
+      }
+    </>
   );
 };
 
