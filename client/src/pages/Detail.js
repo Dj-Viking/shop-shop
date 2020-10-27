@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from '@apollo/react-hooks';
 
+import { idbPromise } from '../utils/helpers.js';
 import { useStoreContext } from '../utils/GlobalState.js';
 import {
   REMOVE_FROM_CART,
@@ -16,19 +17,23 @@ import spinner from '../assets/spinner.gif'
 import Cart from '../components/Cart/index.js';
 
 function Detail() {
+  //global state
   const [state, dispatch] = useStoreContext();
   const { id } = useParams();
+  //local state currentProduct
   const [currentProduct, setCurrentProduct] = useState({})
   const { loading, data } = useQuery(QUERY_PRODUCTS);
   //const { products } = state
 
   useEffect(() => {
+    //already in global store
     if (state.products.length) {
       setCurrentProduct
       (
         state.products.find(product => product._id === id)
       );
-    } else if (data) {
+      //retrieved from server
+    } else if (data) {//data gotten from server
       dispatch
       (
         {
@@ -36,8 +41,27 @@ function Detail() {
           products: data.products
         }
       );
+      // //also save to idb
+      data.products.forEach(product => {
+        idbPromise('products', 'put', product);
+      });
+    } else if (!loading) {//if we're offline can't query server get from idb
+      idbPromise('products', 'get')
+      .then
+      (
+        indexedProducts => 
+        {
+          dispatch
+          (
+            {
+              type: UPDATE_PRODUCTS,
+              products: indexedProducts
+            }
+          );
+        }
+      );
     }
-  }, [state.products, data, dispatch, id]);
+  }, [state.products, data, loading, dispatch, id]);
   //const { cart, product } = state;
   const addToCart = () => {
     const itemInCart = state.cart.find(cartItem => cartItem._id === id);
@@ -50,6 +74,12 @@ function Detail() {
           purchaseQuantity: Number(itemInCart.purchaseQuantity) + 1
         }
       );
+      //also save quantity into idb cart object store
+      idbPromise('cart', 'put', 
+      {
+        ...itemInCart,
+        purchaseQuantity: Number(itemInCart.purchaseQuantity) + 1
+      });
     } else {
       dispatch
       (
@@ -58,6 +88,12 @@ function Detail() {
           product: { ...currentProduct, purchaseQuantity: 1 }
         }
       );
+      //if object isnt in the idb cart store yet put it there
+      idbPromise('cart', 'put', 
+      {
+        ...currentProduct,
+        purchaseQuantity: 1
+      });
     }
   };
   const removeFromCart = () => {
@@ -68,6 +104,11 @@ function Detail() {
         _id: currentProduct._id
       }
     );
+    //when removed update the cart store
+    idbPromise('cart', 'delete', 
+    {
+      ...currentProduct
+    });
   };
 
   return (

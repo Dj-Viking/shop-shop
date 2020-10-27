@@ -12,9 +12,9 @@ export function pluralize(name, count) {
  * 
  * Runs whatever transaction function we need to have run on
  * a successful connection
- * @param {String} storeName 
- * @param {Function} method 
- * @param {Object} object 
+ * @param {String} storeName a string to match against to choose which object store to select 
+ * @param {String} method a string to match against to determine what to do with the store
+ * @param {{properties: *}} object object to manipulate into or out of the object store
  * @returns Promise
  */
 export function idbPromise(storeName, method, object) {
@@ -50,7 +50,7 @@ export function idbPromise(storeName, method, object) {
 
       //open a transaction to whatever we pass into `storeName`
       // must match one of the object store names in this promise
-      tx = db.transaction(storename, 'readWrite');
+      tx = db.transaction(storeName, 'readwrite');
 
       //save a reference to that object store
       store = tx.objectStore(storeName);
@@ -70,6 +70,7 @@ export function idbPromise(storeName, method, object) {
           all.onsuccess = function() {
             resolve(all.result);
           };
+          break;
         case 'delete':
           store.delete(object._id);
           break;
@@ -77,7 +78,6 @@ export function idbPromise(storeName, method, object) {
           console.log('No valid Method!');
           break;
       }
-
       //when transaction done close the connection
       tx.oncomplete = function() {
         db.close();
