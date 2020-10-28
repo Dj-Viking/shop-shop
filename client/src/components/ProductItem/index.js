@@ -2,7 +2,7 @@ import React from "react";
 import { useStoreContext } from '../../utils/GlobalState.js';
 import { ADD_TO_CART, UPDATE_CART_QUANTITY } from '../../utils/actions.js';
 import { Link } from "react-router-dom";
-import { pluralize } from "../../utils/helpers"
+import { pluralize, idbPromise } from "../../utils/helpers"
 
 function ProductItem(item) {
   const {
@@ -28,6 +28,12 @@ function ProductItem(item) {
           purchaseQuantity: Number(itemInCart.purchaseQuantity) + 1
         }
       );
+      //save to idb
+      idbPromise('cart', 'put', 
+      {
+        ...itemInCart,
+        purchaseQuantity: Number(itemInCart.purchaseQuantity) + 1
+      });
     } else {
       dispatch
       (
@@ -36,6 +42,11 @@ function ProductItem(item) {
           product: { ...item, purchaseQuantity: 1 }
         }
       );
+      idbPromise('cart', 'put', 
+      {
+        ...item,
+        purchaseQuantity: 1
+      });
     }
   };
 
