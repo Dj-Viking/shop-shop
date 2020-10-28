@@ -6,6 +6,12 @@ import Auth from '../../utils/auth.js';
 import './style.css';
 import { numberWithCommas, idbPromise } from '../../utils/helpers.js';
 
+import { useLazyQuery } from '@apollo/react-hooks';
+import { QUERY_CHECKOUT } from '../../utils/queries.js';
+import { loadStripe } from '@stripe/stripe-js';
+const stripePromise = loadStripe('pk_test_TYooMQauvdEDq54NiTphI7jx');
+
+
 const Cart = () => {
   // const camera = {
   //   name: 'Camera',
@@ -34,8 +40,12 @@ const Cart = () => {
     if (!state.cart.length || state.cart.length === 0) getCart();
   }, [state.cart.length, dispatch]);
 
+  //establish lazy query use
+  const [getCheckout, { data }] = useLazyQuery(QUERY_CHECKOUT);
+  //data var contains checkout session only after query is called with getCheckout()
 
-  const toggleCart = () => {
+
+  function toggleCart() {
     dispatch
     (
       {
@@ -45,13 +55,49 @@ const Cart = () => {
     console.log(state.cartOpen);
   };
 
-  const calculateTotal = () => {
+  function calculateTotal() {
     let sum = 0;
     state.cart.forEach(item => {
       sum += item.price * item.purchaseQuantity;
     });
     return sum.toFixed(2);
   };
+
+  function submitCheckout() {
+    const productIds = [];
+    state.cart.forEach(item => 
+    {
+      for (let i = 0; i < item.purchaseQuantity; i++) {
+        productIds.push(item._id);
+      }
+    });
+
+    getCheckout(
+      {
+        variables: { products: productIds }
+      }
+    );
+    console.log(productIds);
+  };
+
+  //once data arrives from query with the checkout object
+  // redirect customer to stripe to pay
+  useEffect(() => {
+    if (data) {
+      stripePromise.then
+      (
+        res => 
+        {
+          res.redirectToCheckout
+          (
+            {
+              sessionId: data.checkout.session
+            }
+          );
+        }
+      );
+    }
+  }, [data]);//data from useLazyQuery
 
   return (
     <>
@@ -77,7 +123,7 @@ const Cart = () => {
                   {
                     state.cart.map(item => (
                       <CartItem 
-                        key={item.id}
+                        key={item._id}
                         item={item}
                       />
                     ))
@@ -87,7 +133,9 @@ const Cart = () => {
                     {
                       Auth.loggedIn() 
                       ?
-                      <button>
+                      <button
+                        onClick={submitCheckout}
+                      >
                         Checkout
                       </button>
                       :

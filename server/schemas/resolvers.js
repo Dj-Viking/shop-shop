@@ -57,7 +57,7 @@ const resolvers = {
       //make new url to redirect after success purchase
       // console.log(context.headers);
       const url = new URL(context.headers.referer).origin;
-      console.log(url);
+      //console.log(url);
 
       const order = new Order//sending product ObjectID's in args.products
       (
