@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useStoreContext } from '../../utils/GlobalState.js';
-import { TOGGLE_CART } from '../../utils/actions.js';
+import { TOGGLE_CART, ADD_MULTIPLE_TO_CART } from '../../utils/actions.js';
 import CartItem from '../CartItem/index.js';
 import Auth from '../../utils/auth.js';
 import './style.css';
-import { numberWithCommas } from '../../utils/helpers.js';
+import { numberWithCommas, idbPromise } from '../../utils/helpers.js';
 
 const Cart = () => {
   // const camera = {
@@ -20,6 +20,21 @@ const Cart = () => {
   //   purchaseQuantity: 4
   // }
   const [state, dispatch] = useStoreContext();
+  useEffect(() => {
+    async function getCart() {
+      const cart = await idbPromise('cart', 'get');
+      dispatch
+      (
+        {
+          type: ADD_MULTIPLE_TO_CART,
+          products: [...cart]
+        }
+      );
+    }
+    if (!state.cart.length || state.cart.length === 0) getCart();
+  }, [state.cart.length, dispatch]);
+
+
   const toggleCart = () => {
     dispatch
     (
@@ -29,6 +44,7 @@ const Cart = () => {
     );
     console.log(state.cartOpen);
   };
+
   const calculateTotal = () => {
     let sum = 0;
     state.cart.forEach(item => {
