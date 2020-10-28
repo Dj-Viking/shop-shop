@@ -6,12 +6,13 @@ import { useQuery } from '@apollo/react-hooks';
 import { QUERY_CATEGORIES } from "../../utils/queries";
 
 import { useStoreContext } from '../../utils/GlobalState.js';
+import { idbPromise } from '../../utils/helpers.js';
 
 function CategoryMenu() {
   
   const [state, dispatch] = useStoreContext();
   const {categories} = state;
-  const { data: categoryData } = useQuery(QUERY_CATEGORIES);
+  const { loading, data: categoryData } = useQuery(QUERY_CATEGORIES);
 
   useEffect(() => {
     // if categoryData exists or has changed from the response
@@ -27,8 +28,27 @@ function CategoryMenu() {
           categories: categoryData.categories
         }
       );
+      //also save categories to idb
+      categoryData.categories.forEach(category => {
+        idbPromise('categories', 'put', category);
+      });
+    } else if (!loading) {//if server is offline get categories from idb
+      idbPromise('categories', 'get')
+      .then
+      (
+        categories => 
+        {
+          dispatch
+          (
+            {
+              type: UPDATE_CATEGORIES,
+              categories: categories
+            }
+          )
+        }
+      );
     }
-  }, [categoryData, dispatch]);
+  }, [categoryData, loading, dispatch]);
 
   const handleClick = id => {
     dispatch

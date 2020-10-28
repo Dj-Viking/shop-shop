@@ -69,7 +69,8 @@ const Cart = () => {
                   <div className="flex-row space-between">
                     <strong>Total: ${numberWithCommas(calculateTotal())}</strong>
                     {
-                      Auth.loggedIn() ?
+                      Auth.loggedIn() 
+                      ?
                       <button>
                         Checkout
                       </button>

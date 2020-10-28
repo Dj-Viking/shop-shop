@@ -1,6 +1,8 @@
 import React from 'react';
 import { useStoreContext } from '../../utils/GlobalState.js';
 import { REMOVE_FROM_CART, UPDATE_CART_QUANTITY } from '../../utils/actions.js';
+import { idbPromise } from '../../utils/helpers.js';
+
 
 const CartItem = (props) => {
   const {
@@ -14,7 +16,12 @@ const CartItem = (props) => {
         type: REMOVE_FROM_CART,
         _id: item._id
       }
-    )
+    );
+    //also delete from idb
+    idbPromise('cart', 'delete',
+    {
+      ...item
+    });
   };
   const onChange = (event) => {
     const value = event.target.value;
