@@ -33,6 +33,7 @@ const CartItem = (props) => {
           _id: item._id
         }
       );
+      idbPromise('cart', 'delete', {...item});
     } else {
       dispatch
       (
@@ -42,6 +43,11 @@ const CartItem = (props) => {
           purchaseQuantity: Number(value)
         }
       );
+      idbPromise('cart', 'put', 
+      {
+        ...item,
+        purchaseQuantity: Number(value)
+      });
     }
   };
 
