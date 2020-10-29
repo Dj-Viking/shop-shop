@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 
-import { UPDATE_CATEGORIES, UPDATE_CURRENT_CATEGORY } from '../../utils/actions.js';
+// import { /*UPDATE_CATEGORIES,*/ UPDATE_CURRENT_CATEGORY } from '../../utils/actions.js';
 
 import { useQuery } from '@apollo/react-hooks';
 import { QUERY_CATEGORIES } from "../../utils/queries";
@@ -8,10 +8,35 @@ import { QUERY_CATEGORIES } from "../../utils/queries";
 import { useStoreContext } from '../../utils/GlobalState.js';
 import { idbPromise } from '../../utils/helpers.js';
 
+//REDUX IMPORTS 
+import {
+  updateCategories, updateCurrentCategory
+} from '../../actions';
+
+import { useSelector, useDispatch } from 'react-redux'
+
 function CategoryMenu() {
+
+  //REDUX
+  // observe global commerce state
+  const commerceState = useSelector(state => state.commerce);
+  //use global action dispatcher
+  const dispatchREDUX = useDispatch();
+
+  console.log('VVV CHECKING GLOBAL STATE IN CATEGORY MENU COMPONENT VVV');
+  console.log(commerceState);
+
   
-  const [state, dispatch] = useStoreContext();
-  const {categories} = state;
+  const [, dispatch] = useStoreContext();
+  // const {categories} = state;
+
+  const {//GET REDUX CATEGORIES
+    categories
+  } = commerceState;
+  const categoriesREDUX = categories;
+
+  //GRAPHQL DATABASE GET CATEGORIES QUERY
+  //destructure the categoryData property from the data returned from GRAPHQL
   const { loading, data: categoryData } = useQuery(QUERY_CATEGORIES);
 
   useEffect(() => {
@@ -21,13 +46,16 @@ function CategoryMenu() {
       //execute our dispatch function with our action object
       // indicating the type of action and the data to set our state
       // for categories to something new
-      dispatch
-      (
-        {
-          type: UPDATE_CATEGORIES,
-          categories: categoryData.categories
-        }
-      );
+      // dispatch
+      // (
+      //   {
+      //     type: UPDATE_CATEGORIES,
+      //     categories: categoryData.categories
+      //   }
+      // );
+      //REDUX DISPATCHER
+      dispatchREDUX(updateCategories(categoryData.categories))
+
       //also save categories to idb
       categoryData.categories.forEach(category => {
         idbPromise('categories', 'put', category);
@@ -38,36 +66,41 @@ function CategoryMenu() {
       (
         categories => 
         {
-          dispatch
-          (
-            {
-              type: UPDATE_CATEGORIES,
-              categories: categories
-            }
-          )
+          // dispatch
+          // (
+          //   {
+          //     type: UPDATE_CATEGORIES,
+          //     categories: categories
+          //   }
+          // );
+
+          //REDUX UPDATE CATEGORIES DISPATCH
+          dispatchREDUX(updateCategories(categories));
         }
       );
     }
-  }, [categoryData, loading, dispatch]);
+  }, [categoryData, loading, dispatch, dispatchREDUX]);
 
-  const handleClick = id => {
-    dispatch
-    (
-      {
-        type: UPDATE_CURRENT_CATEGORY,
-        currentCategory: id
-      }
-    )
+  const handleClick = _id => {
+    // dispatch
+    // (
+    //   {
+    //     type: UPDATE_CURRENT_CATEGORY,
+    //     currentCategory: id
+    //   }
+    // );
+    dispatchREDUX(updateCurrentCategory(_id));
   };
 
   const setCurrentCategoryBlank = () => {
-    dispatch
-    (
-      {
-        type: UPDATE_CURRENT_CATEGORY,
-        currentCategory: ''
-      }
-    );
+    // dispatch
+    // (
+    //   {
+    //     type: UPDATE_CURRENT_CATEGORY,
+    //     currentCategory: ''
+    //   }
+    // );
+    dispatchREDUX(updateCurrentCategory(''));
   }
 
   return (
@@ -79,14 +112,14 @@ function CategoryMenu() {
         All Categories
       </button>
       {
-        categories.map(item => (
+        categoriesREDUX.map(category => (
           <button
-            key={item._id}
+            key={category._id}
             onClick={() => {
-              handleClick(item._id);
+              handleClick(category._id)
             }}
           >
-            {item.name}
+            {category.name}
           </button>
         ))
       }
