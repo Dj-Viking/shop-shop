@@ -1,14 +1,14 @@
-export const updateProducts = (data) => {
+export const updateProducts = (products) => {
   return {
     type: 'UPDATE_PRODUCTS',
-    payload: data
+    payload: products
   }
 }
 
-export const updateCategories = (data) => {
+export const updateCategories = (categories) => {
   return {
     type: 'UPDATE_CATEGORIES',
-    payload: data
+    payload: categories
   }
 }
 // case 'UPDATE_CATEGORIES':
@@ -17,10 +17,10 @@ export const updateCategories = (data) => {
 //     categories: [...action.payload]
 //   };
 
-export const updateCurrentCategory = (string) => {
+export const updateCurrentCategory = (name) => {
   return {
     type: 'UPDATE_CURRENT_CATEGORY',
-    payload: string
+    payload: name
   }
 }
 // case 'UPDATE_CURRENT_CATEGORY':

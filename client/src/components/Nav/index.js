@@ -1,24 +1,36 @@
 import React from "react";
 
-import { useStoreContext } from '../../utils/GlobalState.js';
-import { UPDATE_CURRENT_CATEGORY } from '../../utils/actions.js';
+// import { useStoreContext } from '../../utils/GlobalState.js';
+// import { UPDATE_CURRENT_CATEGORY } from '../../utils/actions.js';
 
 import Auth from "../../utils/auth";
 import { Link } from "react-router-dom";
 
+//REDUX IMPORTS
+import { useDispatch } from 'react-redux';
+//REDUX ACTIONS
+import {
+  updateCurrentCategory
+} from '../../actions';
 function Nav() {
   //retrieve the global state object and dispatch method to update state
-  const [, dispatch] = useStoreContext();
+  // const [, dispatch] = useStoreContext();
   //console.log(categories);
 
+  //REDUX DISPATCH FUNCTION
+  const dispatchREDUX = useDispatch();
+
   const setCurrentCategoryBlank = () => {
-    dispatch
-    (
-      {
-        type: UPDATE_CURRENT_CATEGORY,
-        currentCategory: ''
-      }
-    );
+    // dispatch
+    // (
+    //   {
+    //     type: UPDATE_CURRENT_CATEGORY,
+    //     currentCategory: ''
+    //   }
+    // );
+    
+    //REDUX DISPATCH
+    dispatchREDUX(updateCurrentCategory(''));
   }
 
   function showNavigation() {
