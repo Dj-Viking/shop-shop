@@ -1,5 +1,5 @@
 const commerceReducer = (
-  state = {//initial global redux state
+  state = {//initial commerceReducer redux state
     products: [],
     cart: [],
     cartOpen: false,
@@ -36,7 +36,7 @@ const commerceReducer = (
       }
     case 'REMOVE_FROM_CART':
       let newState = state.cart.filter(product => {
-        return product._id !== action.payload._id
+        return product._id !== action.payload
       })
       return {
         ...state,
@@ -44,7 +44,14 @@ const commerceReducer = (
       }
     case 'UPDATE_CART_QUANTITY':
       return {
-
+        ...state,
+        cartOpen: true,
+        cart: state.cart.map(product => {
+          if (action._id === product._id) {
+            product.purchaseQuantity = action.payload
+          }
+          return product;
+        })
       }
     case 'CLEAR_CART':
       return {
@@ -52,7 +59,8 @@ const commerceReducer = (
       }
     case 'TOGGLE_CART':
       return {
-
+        ...state,
+        cartOpen: !state.cartOpen
       }
     default:
       return state;

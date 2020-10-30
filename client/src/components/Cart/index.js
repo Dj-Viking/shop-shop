@@ -1,63 +1,80 @@
 import React, { useEffect } from 'react';
-import { useStoreContext } from '../../utils/GlobalState.js';
-import { TOGGLE_CART, ADD_MULTIPLE_TO_CART } from '../../utils/actions.js';
 import CartItem from '../CartItem/index.js';
+// import { useStoreContext } from '../../utils/GlobalState.js';
+// import { TOGGLE_CART, ADD_MULTIPLE_TO_CART } from '../../utils/actions.js';
 import Auth from '../../utils/auth.js';
 import './style.css';
 import { numberWithCommas, idbPromise } from '../../utils/helpers.js';
 
+//GRAPHQL APOLLO IMPORTS
 import { useLazyQuery } from '@apollo/react-hooks';
 import { QUERY_CHECKOUT } from '../../utils/queries.js';
+
+
+//REDUX IMPORTS
+import { useSelector, useDispatch } from 'react-redux';
+//REDUX ACTIONS
+import {
+  addMultipleToCart,
+  toggleCart
+} from '../../actions';
+
+//STRIPE IMPORTS
 import { loadStripe } from '@stripe/stripe-js';
 const stripePromise = loadStripe('pk_test_TYooMQauvdEDq54NiTphI7jx');
 
-
 const Cart = () => {
-  // const camera = {
-  //   name: 'Camera',
-  //   image: 'camera.jpg',
-  //   price: 5,
-  //   purchaseQuantity: 3
-  // };
-  // const soap = {
-  //   name: 'Soap',
-  //   image: 'soap.jpg',
-  //   price: 6,
-  //   purchaseQuantity: 4
-  // }
-  const [state, dispatch] = useStoreContext();
+  //REDUX OBSERVE GLOBAL STATE IMPORT
+  const commerceState = useSelector(state => state.commerce);
+  //REDUX OBSERVE GLOBAL STATE PIECES
+  const {
+    cart,
+    cartOpen
+  } = commerceState
+  console.log(cart)
+  console.log(cartOpen);
+  //REDUX DISPATCHER FUNCTION
+  const dispatchREDUX = useDispatch();
+
+  // const [, dispatch] = useStoreContext();
   useEffect(() => {
-    async function getCart() {
+    async function getIDBCart() {
       const cart = await idbPromise('cart', 'get');
-      dispatch
-      (
-        {
-          type: ADD_MULTIPLE_TO_CART,
-          products: [...cart]
-        }
-      );
+      // dispatch
+      // (
+      //   {
+      //     type: ADD_MULTIPLE_TO_CART,
+      //     products: [...cart]
+      //   }
+      // );
+      
+      //REDUX DISPATCH
+      dispatchREDUX(addMultipleToCart(cart))
     }
-    if (!state.cart.length || state.cart.length === 0) getCart();
-  }, [state.cart.length, dispatch]);
+    if (!cart.length || cart.length === 0) getIDBCart();
+  }, [cart.length, dispatchREDUX]);
 
   //establish lazy query use
   const [getCheckout, { data }] = useLazyQuery(QUERY_CHECKOUT);
   //data var contains checkout session only after query is called with getCheckout()
 
 
-  function toggleCart() {
-    dispatch
-    (
-      {
-        type: TOGGLE_CART
-      }
-    );
-    console.log(state.cartOpen);
+  function changeCart() {
+    // dispatch
+    // (
+    //   {
+    //     type: TOGGLE_CART
+    //   }
+    // );
+    // console.log(state.cartOpen);
+    //console.log("clicked");
+    //REDUX DISPATCH
+    dispatchREDUX(toggleCart(cartOpen))
   };
 
   function calculateTotal() {
     let sum = 0;
-    state.cart.forEach(item => {
+    cart.forEach(item => {
       sum += item.price * item.purchaseQuantity;
     });
     return sum.toFixed(2);
@@ -65,14 +82,14 @@ const Cart = () => {
 
   function submitCheckout() {
     const productIds = [];
-    state.cart.forEach(item => 
+    cart.forEach(item => 
     {
       for (let i = 0; i < item.purchaseQuantity; i++) {
         productIds.push(item._id);
       }
     });
 
-    getCheckout(
+    getCheckout(//TO UPDATE DATABASE
       {
         variables: { products: productIds }
       }
@@ -102,13 +119,13 @@ const Cart = () => {
   return (
     <>
       {
-        state.cartOpen 
+        cartOpen 
         ?
         (
           <div className="cart">
             <div 
               className="close"
-              onClick={toggleCart}
+              onClick={changeCart}
             >
                 [close]
             </div>
@@ -116,12 +133,12 @@ const Cart = () => {
               Shopping Cart
             </h2>
             {
-              state.cart.length
+              cart.length
               ?
               (
                 <div>
                   {
-                    state.cart.map(item => (
+                    cart.map(item => (
                       <CartItem 
                         key={item._id}
                         item={item}
@@ -157,32 +174,13 @@ const Cart = () => {
                 </h3>
               )
             }
-            {
-              /* <div>
-                  <CartItem item={camera} />
-                  <CartItem item={soap} />
-                  <div className="flex-row space-between">
-                    <strong>Total: $0</strong>
-                    {
-                      Auth.loggedIn() 
-                      ?
-                      <button>
-                        Checkout
-                      </button>
-                      :
-                      <span>(log in to check out)</span>
-                    }
-                  </div>
-                </div> 
-              */
-            }
           </div>
         )
         :
         (
           <div
             className="cart-closed"
-            onClick={toggleCart}
+            onClick={changeCart}
           >
             <span
               role="img"
