@@ -29,6 +29,8 @@ export const updateCurrentCategory = (string) => {
 //     currentCategory: action.payload
 //   }
 
+
+
 export const addToCart = (data) => {
   return {
     type: 'ADD_TO_CART',
@@ -54,16 +56,13 @@ export const addMultipleToCart = (data) => {
 //     cart: [...state.cart, ...action.payload ]
 //   }
 
-export const removeFromCart = (data) => {
+export const removeFromCart = (_id) => {
   return {//ACTION OBJECT RETURNED BY ACTION FUNCTION INVOKED BY THE DISPATCHER
     type: 'REMOVE_FROM_CART',
-    payload: data._id
+    payload: _id
   }
 }
-// case 'REMOVE_FROM_CART':
-//   return {
-    
-//   }
+
 // case REMOVE_FROM_CART: 
 // let newState = state.cart.filter(product => {
 //   return product._id !== action._id;
@@ -73,3 +72,20 @@ export const removeFromCart = (data) => {
 //   cartOpen: newState.length > 0,//checking if true or false
 //   cart: newState
 // };
+
+
+
+export const updateCartQuantity = (item, quantity) => {
+  return {
+    type: 'UPDATE_CART_QUANTITY',
+    _id: item._id,
+    payload: quantity
+  }
+}
+
+export const toggleCart = (data) => {
+  return {
+    type: 'TOGGLE_CART',
+    payload: data
+  }
+}
