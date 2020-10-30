@@ -57,7 +57,7 @@ const resolvers = {
       //make new url to redirect after success purchase
       // console.log(context.headers);
       const url = new URL(context.headers.referer).origin;
-      //console.log(url);
+      console.log(url);
 
       const order = new Order//sending product ObjectID's in args.products
       (
@@ -65,10 +65,12 @@ const resolvers = {
           products: args.products
         }
       );
+      console.log(order);
       //not actually storing the order in the DB just using it as a way to
       // separate a product model from an order model
       const { products } = await order.populate('products').execPopulate();
-
+      console.log(products);
+      
       const line_items = [];
       for (let i = 0; i < products.length; i++) {
         //gen a product id
@@ -77,6 +79,7 @@ const resolvers = {
             name: products[i].name,
             description: products[i].description,
             images: [`${url}/images/${products[i].image}`]
+            // images: [`https://picsum.photos/280/320?random=4`]
           }
         );
 

@@ -33,10 +33,14 @@ const Cart = () => {
   } = commerceState
   console.log(cart)
   console.log(cartOpen);
+
   //REDUX DISPATCHER FUNCTION
   const dispatchREDUX = useDispatch();
 
   // const [, dispatch] = useStoreContext();
+
+  //as soon as the cartlength changes run whats in use effect
+  //if cart.length is falsey get cart from IDB
   useEffect(() => {
     async function getIDBCart() {
       const cart = await idbPromise('cart', 'get');
@@ -57,7 +61,7 @@ const Cart = () => {
   //establish lazy query use
   const [getCheckout, { data }] = useLazyQuery(QUERY_CHECKOUT);
   //data var contains checkout session only after query is called with getCheckout()
-
+  console.log(data);
 
   function changeCart() {
     // dispatch
@@ -89,7 +93,9 @@ const Cart = () => {
       }
     });
 
-    getCheckout(//TO UPDATE DATABASE
+    //execute a query only when using the getter function
+    // establish variables for the resolver to query mongoose
+    getCheckout(//LAZY GET PRODUCTS FROM DATABASE
       {
         variables: { products: productIds }
       }
