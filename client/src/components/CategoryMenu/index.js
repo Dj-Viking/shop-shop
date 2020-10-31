@@ -5,7 +5,7 @@ import React, { useEffect } from "react";
 import { useQuery } from '@apollo/react-hooks';
 import { QUERY_CATEGORIES } from "../../utils/queries";
 
-import { useStoreContext } from '../../utils/GlobalState.js';
+// import { useStoreContext } from '../../utils/GlobalState.js';
 import { idbPromise } from '../../utils/helpers.js';
 
 //REDUX IMPORTS 
@@ -27,7 +27,7 @@ function CategoryMenu() {
   console.log(commerceState);
 
   
-  const [, dispatch] = useStoreContext();
+  // const [, dispatch] = useStoreContext();
   // const {categories} = state;
 
   const {//GET REDUX CATEGORIES
@@ -79,7 +79,7 @@ function CategoryMenu() {
         }
       );
     }
-  }, [categoryData, loading, dispatch, dispatchREDUX]);
+  }, [categoryData, loading, dispatchREDUX]);
 
   const handleClick = _id => {
     // dispatch
